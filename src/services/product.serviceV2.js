@@ -8,7 +8,11 @@ const {
 } = require('../models/product.model');
 const { BadRequestError } = require('../core/error.response');
 
-const { findAllDraftsForShop } = require('../models/repositories/product.repo');
+const {
+  findAllDraftsForShop,
+  publishProductByShop,
+  findAllPublishedForShop,
+} = require('../models/repositories/product.repo');
 
 // use Factory pattern + Stragety Pattern
 
@@ -35,10 +39,25 @@ class ProductFactory {
     return new productClass(payload).createProduct();
   }
 
+  //Put
+
+  static async publishProductByShop({ product_shop, product_id }) {
+    return await publishProductByShop({ product_shop, product_id });
+  }
+
+  // End put
+
+  // query
+
   static async findAllDraftsForShop({ product_shop, limit = 50, skip = 0 }) {
     const query = { product_shop, isDraft: true };
 
     return await findAllDraftsForShop({ query, limit, skip });
+  }
+  static async findAllPublishedForShop({ product_shop, limit = 50, skip = 0 }) {
+    const query = { product_shop, isPublished: true };
+
+    return await findAllPublishedForShop({ query, limit, skip });
   }
 }
 
