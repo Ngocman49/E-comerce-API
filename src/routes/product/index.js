@@ -7,6 +7,12 @@ const productController = require('./../../controllers/product.controller');
 
 const router = express.Router();
 
+router.get(
+  '/search/:keySearch',
+  asyncHandler(productController.getListSearchProduct)
+);
+
+//authenication
 router.use(authenticationV2);
 
 router.post('/', asyncHandler(productController.createProduct));
@@ -14,6 +20,10 @@ router.post('/', asyncHandler(productController.createProduct));
 router.post(
   '/published/:id',
   asyncHandler(productController.publishProductByShop)
+);
+router.post(
+  '/unpublished/:id',
+  asyncHandler(productController.unPublishProductByShop)
 );
 
 // QUERY //

@@ -15,6 +15,21 @@ const findAllPublishedForShop = async ({ query, limit, skip }) => {
   return await queryProduct({ query, limit, skip });
 };
 
+const searchProductByUser = async ({ keySearch }) => {
+  const regexSearch = new RegExp(keySearch);
+  const results = await product
+    .find(
+      {
+        isPublished: true,
+        $text: { $search: regexSearch },
+      },
+      { score: { $meta: 'textScore' } }
+    )
+    .sort({ score: { $meta: 'textScore' } })
+    .lean();
+  return results;
+};
+
 const publishProductByShop = async ({ product_shop, product_id }) => {
   const foundShop = await product.findOneAndUpdate(
     {
@@ -24,6 +39,28 @@ const publishProductByShop = async ({ product_shop, product_id }) => {
     {
       isDraft: false,
       isPublished: true,
+    },
+    {
+      new: true,
+    }
+  );
+  if (!foundShop) {
+    return null;
+  }
+
+  const { modifiedCount } = foundShop.updateOne(foundShop);
+  return modifiedCount;
+};
+
+const unPublishProductByShop = async ({ product_shop, product_id }) => {
+  const foundShop = await product.findOneAndUpdate(
+    {
+      product_shop: new Types.ObjectId(product_shop),
+      _id: new Types.ObjectId(product_id),
+    },
+    {
+      isDraft: true,
+      isPublished: false,
     },
     {
       new: true,
@@ -52,4 +89,6 @@ module.exports = {
   findAllDraftsForShop,
   findAllPublishedForShop,
   publishProductByShop,
+  unPublishProductByShop,
+  searchProductByUser,
 };

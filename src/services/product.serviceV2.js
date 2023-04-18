@@ -12,6 +12,8 @@ const {
   findAllDraftsForShop,
   publishProductByShop,
   findAllPublishedForShop,
+  unPublishProductByShop,
+  searchProductByUser,
 } = require('../models/repositories/product.repo');
 
 // use Factory pattern + Stragety Pattern
@@ -45,6 +47,9 @@ class ProductFactory {
     return await publishProductByShop({ product_shop, product_id });
   }
 
+  static async unPublishProductByShop({ product_shop, product_id }) {
+    return await unPublishProductByShop({ product_shop, product_id });
+  }
   // End put
 
   // query
@@ -59,6 +64,12 @@ class ProductFactory {
 
     return await findAllPublishedForShop({ query, limit, skip });
   }
+
+  static async searchProducts({ keySearch }) {
+    return await searchProductByUser({ keySearch });
+  }
+
+  // end query
 }
 
 /// define base product class

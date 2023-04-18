@@ -65,6 +65,10 @@ const productSchema = new Schema(
   }
 );
 
+//create index for search
+
+productSchema.index({ product_name: 'text', product_description: 'text' });
+
 // document middleware //
 
 productSchema.pre('save', function (next) {
