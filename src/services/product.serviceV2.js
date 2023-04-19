@@ -14,7 +14,10 @@ const {
   findAllPublishedForShop,
   unPublishProductByShop,
   searchProductByUser,
+  findAllProducts,
+  findProduct,
 } = require('../models/repositories/product.repo');
+const shopModel = require('../models/shop.model');
 
 // use Factory pattern + Stragety Pattern
 
@@ -31,13 +34,17 @@ class ProductFactory {
   }
 
   static async createProduct(type, payload) {
+    // const foundShop = await shopModel.findById(payload.product_shop);
+
+    // if (!foundShop) {
+    //   throw new BadRequestError(`No shop with that id`);
+    // }
     const productClass = ProductFactory.productRegistry[type];
     console.log(productClass);
     console.log(payload);
     if (!productClass) {
       throw new BadRequestError(`Invalid product type ${type}`);
     }
-
     return new productClass(payload).createProduct();
   }
 
@@ -68,7 +75,23 @@ class ProductFactory {
   static async searchProducts({ keySearch }) {
     return await searchProductByUser({ keySearch });
   }
-
+  static async findAllProducts({
+    limit = 50,
+    sort = 'ctime',
+    page = 1,
+    filter = { isPublished: true },
+  }) {
+    return await findAllProducts({
+      limit,
+      sort,
+      filter,
+      page,
+      select: ['product_name', 'product_price', 'product_thumb'],
+    });
+  }
+  static async findProduct({ product_id }) {
+    return await findProduct({ product_id, unSelect: ['__v'] });
+  }
   // end query
 }
 
