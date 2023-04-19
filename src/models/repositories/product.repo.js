@@ -29,7 +29,7 @@ const searchProductByUser = async ({ keySearch }) => {
     )
     .sort({ score: { $meta: 'textScore' } })
     .lean();
-  return results;
+  return results ? results : null;
 };
 
 const publishProductByShop = async ({ product_shop, product_id }) => {
@@ -49,9 +49,9 @@ const publishProductByShop = async ({ product_shop, product_id }) => {
   if (!foundShop) {
     return null;
   }
-
-  const { modifiedCount } = foundShop.updateOne(foundShop);
-  return modifiedCount;
+  return foundShop;
+  // const { modifiedCount } = foundShop.update(foundShop);
+  // return modifiedCount;
 };
 
 const unPublishProductByShop = async ({ product_shop, product_id }) => {
@@ -68,12 +68,7 @@ const unPublishProductByShop = async ({ product_shop, product_id }) => {
       new: true,
     }
   );
-  if (!foundShop) {
-    return null;
-  }
-
-  const { modifiedCount } = foundShop.updateOne(foundShop);
-  return modifiedCount;
+  return foundShop;
 };
 
 const findAllProducts = async ({ limit, sort, page, filter, select }) => {
@@ -87,11 +82,18 @@ const findAllProducts = async ({ limit, sort, page, filter, select }) => {
     .select(getSelectData(select)) // getSelectData transform ['a','b'] to {a:1, b:2}
     .lean()
     .exec();
+
   return products;
 };
 
 const findProduct = async ({ product_id, unSelect }) => {
-  return await product.findById(product_id).select(unGetSelectData(unSelect));
+  const foundProduct = await product
+    .findById(product_id)
+    .populate('product_shop', 'name email -_id')
+    .select(unGetSelectData(unSelect))
+    .lean();
+  console.log(foundProduct);
+  return foundProduct;
 };
 
 const queryProduct = async ({ query, limit, skip }) => {
