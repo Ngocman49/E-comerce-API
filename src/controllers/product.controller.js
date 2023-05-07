@@ -144,7 +144,7 @@ class ProductController {
         )
       );
     }
-    console.log(`key search is`, req.params);
+
     new SuccessResponse({
       message: 'Search success',
       metadata: searchProducts,

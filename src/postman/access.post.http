@@ -5,8 +5,8 @@ Content-Type: application/json
 x-api-key: fa589511d58fb354f4df8168603dea8994154db765ef361971aee97da3db7fc985bfea980abf8fd2bae4ea5c41a9afd12f4b7d0ecd58a269251cdb7441693609
 
 {
-    "name": "Shop book",
-    "email": "test@gmail.com",
+    "name": "Monkey Shop",
+    "email": "Monkey@gmail.com",
     "password": "test1234"
 }
 
