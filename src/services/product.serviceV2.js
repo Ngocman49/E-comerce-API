@@ -16,8 +16,11 @@ const {
   searchProductByUser,
   findAllProducts,
   findProduct,
+  updateProductById,
 } = require('../models/repositories/product.repo');
-const shopModel = require('../models/shop.model');
+// const shopModel = require('../models/shop.model');
+const { removeUndefinedObject, updateNestedObjectParser } = require('../utils');
+const { insertInventory } = require('../models/repositories/inventory.repo');
 
 // use Factory pattern + Stragety Pattern
 
@@ -48,6 +51,20 @@ class ProductFactory {
     return new productClass(payload).createProduct();
   }
 
+  static async updateProduct(type, productId, payload) {
+    // const foundShop = await shopModel.findById(payload.product_shop);
+
+    // if (!foundShop) {
+    //   throw new BadRequestError(`No shop with that id`);
+    // }
+    const productClass = ProductFactory.productRegistry[type];
+    console.log(productClass);
+    console.log(payload);
+    if (!productClass) {
+      throw new BadRequestError(`Invalid product type ${type}`);
+    }
+    return new productClass(payload).updateProduct(productId);
+  }
   //Put
 
   static async publishProductByShop({ product_shop, product_id }) {
@@ -118,7 +135,22 @@ class Product {
     this.product_attributes = product_attributes;
   }
   async createProduct(product_id) {
-    return await product.create({ ...this, _id: product_id });
+    const newProduct = await product.create({ ...this, _id: product_id });
+    //console.log(`new Product is:::`, newProduct);
+
+    const young = await insertInventory({
+      productId: newProduct._id,
+      shopId: this.product_shop,
+      stock: this.product_quantity,
+    });
+
+    return newProduct;
+  }
+
+  // update product
+
+  async updateProduct(productId, bodyUpdate) {
+    return await updateProductById({ productId, bodyUpdate, model: product });
   }
 }
 
@@ -141,6 +173,34 @@ class Clothing extends Product {
       );
     }
   }
+  async updateProduct(productId) {
+    /**
+     * check gia tri dau vao
+     * {
+     *    a: undefined
+     *    b: null
+     * }
+     * 1) xoa gia tri null or undefined
+     * 2) check xem update o attributes nao?
+     */
+    console.log(`[1]:::`, this);
+    const objectParams = removeUndefinedObject(this);
+    console.log(`[2]:::`, objectParams);
+
+    if (objectParams.product_attributes) {
+      // update child
+      await updateProductById({
+        productId,
+        objectParams,
+        model: clothing,
+      });
+    }
+    const updateProduct = await super.updateProduct(
+      productId,
+      updateNestedObjectParser(objectParams)
+    );
+    return updateProduct;
+  }
 }
 
 // define sub-class for diffrent product types Electronic
@@ -155,7 +215,9 @@ class Electronic extends Product {
       if (!newElectronic)
         throw new BadRequestError('Create new clothing error');
       const newProduct = await super.createProduct(newElectronic._id);
-      if (!newProduct) throw new BadRequestError('create new Product error');
+      console.log(newProduct);
+      if (!newProduct)
+        throw new BadRequestError('create new Product error roi');
       return newProduct;
     } catch (err) {
       throw new BadRequestError(

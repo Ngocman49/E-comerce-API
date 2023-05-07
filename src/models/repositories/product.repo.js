@@ -46,12 +46,8 @@ const publishProductByShop = async ({ product_shop, product_id }) => {
       new: true,
     }
   );
-  if (!foundShop) {
-    return null;
-  }
+  console.log(`Published: ${foundShop}`);
   return foundShop;
-  // const { modifiedCount } = foundShop.update(foundShop);
-  // return modifiedCount;
 };
 
 const unPublishProductByShop = async ({ product_shop, product_id }) => {
@@ -96,6 +92,17 @@ const findProduct = async ({ product_id, unSelect }) => {
   return foundProduct;
 };
 
+const updateProductById = async ({
+  productId,
+  bodyUpdate,
+  model,
+  isNew = true,
+}) => {
+  return await model.findByIdAndUpdate(productId, bodyUpdate, {
+    new: isNew,
+  });
+};
+
 const queryProduct = async ({ query, limit, skip }) => {
   // console.log(query);
   return await product
@@ -116,4 +123,5 @@ module.exports = {
   searchProductByUser,
   findAllProducts,
   findProduct,
+  updateProductById,
 };

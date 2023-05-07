@@ -36,19 +36,53 @@ class ProductController {
     }).send(res);
   });
 
+  //patch
+
+  updateProduct = asyncHandler(async (req, res, next) => {
+    const updated = await ProductServiceV2.updateProduct(
+      req.body.product_type,
+      req.params.productId,
+      {
+        ...req.body,
+        product_shop: req.user.userId,
+      }
+    );
+    if (!updated) {
+      return next(new BadRequestError('update failed'));
+    }
+    return new SuccessResponse({
+      message: 'update success',
+      metadata: updated,
+    }).send(res);
+  });
+
   // put//
+
+  // publishProductByShop = asyncHandler(async (req, res, next) => {
+  //   const published = await ProductServiceV2.publishProductByShop({
+  //     product_shop: req.user.userId,
+  //     product_id: req.params.productId,
+  //   });
+  //   if (!published) {
+  //     return next(new BadRequestError(`published failed`));
+  //   }
+
+  //   new SuccessResponse({
+  //     message: 'Published product success',
+  //     metadata: published,
+  //   }).send(res);
+  // });
 
   publishProductByShop = asyncHandler(async (req, res, next) => {
     const published = await ProductServiceV2.publishProductByShop({
       product_shop: req.user.userId,
-      product_id: req.params.id,
+      product_id: req.params.productId,
     });
     if (!published) {
       return next(new BadRequestError(`published failed`));
     }
-
     new SuccessResponse({
-      message: 'Published product success',
+      message: 'publish product success',
       metadata: published,
     }).send(res);
   });
@@ -56,7 +90,7 @@ class ProductController {
   unPublishProductByShop = asyncHandler(async (req, res, next) => {
     const unPublished = await ProductServiceV2.unPublishProductByShop({
       product_shop: req.user.userId,
-      product_id: req.params.id,
+      product_id: req.params.productId,
     });
     if (!unPublished) {
       return next(new BadRequestError(`unpublished failed`));
@@ -128,7 +162,7 @@ class ProductController {
   });
   findProduct = asyncHandler(async (req, res, next) => {
     const foundProduct = await ProductServiceV2.findProduct({
-      product_id: req.params.product_id,
+      product_id: req.params.productId,
     });
     if (!foundProduct) {
       return next(
