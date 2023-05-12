@@ -21,12 +21,12 @@ const findAllDiscountCodeUnSelect = async ({
     .lean();
   return documents;
 };
-const findAllDiscountCodesSelect = async ({
+const findAllDiscountCodeSelect = async ({
   limit = 50,
   page = 1,
   sort = 'ctime',
   filter,
-  unSelect,
+  select,
   model,
 }) => {
   const skip = (page - 1) * limit;
@@ -36,12 +36,18 @@ const findAllDiscountCodesSelect = async ({
     .sort(sortBy)
     .skip(skip)
     .limit(limit)
-    .select(getSelectData(unSelect))
+    .select(getSelectData(select))
     .lean();
   return documents;
 };
 
+const checkDiscountExist = async ({ model, filter }) => {
+  const foundDiscount = await model.findOne(filter).lean();
+  return foundDiscount;
+};
+
 module.exports = {
   findAllDiscountCodeUnSelect,
-  findAllDiscountCodesSelect,
+  findAllDiscountCodeSelect,
+  checkDiscountExist,
 };
