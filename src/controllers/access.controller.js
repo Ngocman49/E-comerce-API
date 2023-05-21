@@ -2,9 +2,10 @@
 
 const AccessService = require('./../services/access.service');
 const { OK, CREATED, SuccessResponse } = require('./../core/success.response');
+const { asyncHandler } = require('../helpers/asyncHandler');
 
 class AcessController {
-  handlerRefreshToken = async (req, res, next) => {
+  handlerRefreshToken = asyncHandler(async (req, res, next) => {
     // V1
 
     // new SuccessResponse({
@@ -22,22 +23,22 @@ class AcessController {
         keyStore: req.keyStore,
       }),
     }).send(res);
-  };
+  });
 
-  login = async (req, res, next) => {
+  login = asyncHandler(async (req, res, next) => {
     new SuccessResponse({
       metadata: await AccessService.login(req.body),
     }).send(res);
-  };
+  });
 
-  logout = async (req, res, next) => {
+  logout = asyncHandler(async (req, res, next) => {
     new SuccessResponse({
       message: 'Logout success',
       metadata: await AccessService.logout({ keyStore: req.keyStore }),
     }).send(res);
-  };
+  });
 
-  sigUp = async (req, res, next) => {
+  sigUp = asyncHandler(async (req, res, next) => {
     console.log(`[P]::signUp::`, req.body);
 
     new CREATED({
@@ -47,7 +48,7 @@ class AcessController {
         limit: 10,
       },
     }).send(res);
-  };
+  });
 }
 
 module.exports = new AcessController();

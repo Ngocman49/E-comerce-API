@@ -204,6 +204,7 @@ class DiscountService {
     if (discount_min_order_value > 0) {
       // get total
       totalOrder = products.reduce((acc, product) => {
+        console.log(acc);
         return acc + product.quantity * product.price;
       }, 0);
       if (totalOrder === discount_min_order_value) {
