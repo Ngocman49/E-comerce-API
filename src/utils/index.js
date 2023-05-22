@@ -41,7 +41,7 @@ const updateNestedObjectParser = (obj) => {
       final[k] = obj[k];
     }
   });
-  console.log(`Final:::`, final);
+
   return final;
 };
 

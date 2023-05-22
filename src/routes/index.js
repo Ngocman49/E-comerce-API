@@ -16,4 +16,6 @@ router.use('/v1/api/', require('./access'));
 
 router.use('/v1/api/discount', require('./discount'));
 
+router.use('/v1/api/cart', require('./cart'));
+
 module.exports = router;
